@@ -42,6 +42,10 @@ def main() -> None:
 
     known_ids = set()
 
+    # Remove the hrs
+    for hr in soup.find_all("hr"):
+        hr.unwrap()
+
     # Ensure there are no duplicates
     for event in soup.find_all('div', class_="productItem"):
         a = event.find("a")
@@ -50,6 +54,8 @@ def main() -> None:
         id = name.split("-")[2]
         assert id not in known_ids, id
         known_ids.add(id)
+        hr = soup.new_tag("hr")
+        event.insert(0, hr)
 
 
     # Update all links
