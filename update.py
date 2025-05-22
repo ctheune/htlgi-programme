@@ -280,6 +280,7 @@ def main() -> None:
 <label>Time</label>
 
 <ul>
+    <li style="margin-bottom: 1em;"><a _="on click jumpToNextEvent()">Jump to next event</a></li>
 """
     for date in date_navs:
         result += f"""
@@ -288,7 +289,6 @@ def main() -> None:
 
 
     result += f"""
-    <li><a _="on click jumpToNextEvent()">Jump to next event</a></li>
 </ul>
 </div>
 
