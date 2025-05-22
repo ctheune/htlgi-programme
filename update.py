@@ -10,7 +10,6 @@
 from bs4 import BeautifulSoup
 import datetime
 import humanize
-
 import requests
 from pathlib import Path
 
@@ -61,6 +60,14 @@ def main() -> None:
         venue = event.find(class_="product_details_inner").find_all("div")[2]
         assert "Venue:" in event.get_text()
         venue["class"] = "venue"
+
+        # Mark epoch time for this event
+        date = event.find(class_="programme-page--date").text.strip()
+        time = event.find(class_="programme-page--time").text.strip()
+        # 'Fri 23 May 4:15pm'
+        event_time = datetime.datetime.strptime(f"{date} {time};2025", "%a %d %b %I:%M%p;%Y")
+        timestamp = event_time.replace(tzinfo=datetime.timezone.utc).timestamp()
+        event["timestamp"] = str(timestamp * 1000)
 
 
     # Update all links
@@ -140,11 +147,11 @@ def main() -> None:
     def applyFilters()
         set :location_filter to (the (value of #filterLocation))
         set :sessiontype_filter to (the (value of #filterSessiontype))
-        show .productItem
+        remove .hidden from .productItem
         if :location_filter is not '- All -' then
             for i in .productItem 
                 if (the first of .venue in i)'s textContent does not contain :location_filter then
-                    hide i
+                    add .hidden to i
                 end
             end
         end
@@ -152,10 +159,37 @@ def main() -> None:
         if :sessiontype_filter is not '- All -' then
             for i in .productItem 
                 if (the first of .sessiontype in i)'s textContent does not contain :sessiontype_filter then
-                    hide i
+                    add .hidden to i
                 end
             end
         end
+    end
+
+    def jumpToNextEvent()
+        set :now to Date.now()
+        for i in .productItem 
+            if i matches .hidden then
+                continue
+            end
+            set :event_time to i's @timestamp as an Int
+            if :event_time > :now then
+                go to i smoothly
+                break
+            end
+        end
+    end
+
+    def markPastEvents()
+        set :now to Date.now()
+        for i in .productItem 
+            set :event_time to i's @timestamp as an Int
+            if :event_time < :now then
+                add .elapsed to it
+                continue
+            end
+            break
+        end
+
     end
 </script>
 
@@ -171,9 +205,19 @@ def main() -> None:
     cursor: zoom-in;
 }
 
-.field {
+.col {
     width: 20em;
+    float: left;
 }
+
+.elapsed {
+  opacity: 0.3;
+}
+
+.hidden {
+    display: none;
+}
+
 
 @media (max-width:1024px)  { 
     /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
@@ -185,11 +229,6 @@ def main() -> None:
 }
 @media (min-width:1025px) {
    /* big landscape tablets, laptops,and desktops */ 
-
-    .col {
-        width: 20em;
-        float: left;
-    }
 
     #warning {
         margin-bottom: 1em;
@@ -206,16 +245,22 @@ def main() -> None:
         z-index: 2;
         background: white;
     }
+
+    html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 11em; 
+    }
+
 }
 </style>
 </head>""" + f"""
-<body>
+<body _="init markPastEvents()">
 
 <main>
 <header>
 <div id="warning" _="on click toggle the *display of the .explain in me">
 <h3>This is NOT the official HTLGI website. <span style="font-size:10pt; font-style: italic; font-weight:normal;">Click for details and help ...</span></h3>
-<div class="explain" _="init hide me">
+<div class="explain" style="display:none;">
     <p>
     This is a helper to navigate the programme faster than the official site. 
     This has been made for the Dave Snowden & friends @ HTLGI group.
@@ -232,6 +277,8 @@ def main() -> None:
 
     result += """
 <div class="col">
+<label>Time</label>
+
 <ul>
 """
     for date in date_navs:
@@ -241,6 +288,7 @@ def main() -> None:
 
 
     result += f"""
+    <li><a _="on click jumpToNextEvent()">Jump to next event</a></li>
 </ul>
 </div>
 
