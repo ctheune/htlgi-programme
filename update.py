@@ -144,7 +144,23 @@ def main() -> None:
     <link rel="stylesheet" type="text/css" href="https://howthelightgetsin.org//htlgiecommerce/css/EventProduct.css?m=1655470222" />
 
 <script type="text/hyperscript">
+    def updateLocationForFilters()
+        log "Updating location for filters"
+        set :location to #filterLocation
+        set :sessiontype to #filterSessiontype
+        log :location
+        log :sessiontype
+        set :hash to document.location.hash
+        log :hash
+        if :hash is null then
+            set :hash to ""
+        end
+        call history.pushState({}, document.title, "?location=" + encodeURIComponent(:location.value) + "&sessiontype=" + encodeURIComponent(:sessiontype.value) + :hash)
+        call applyFilters()
+    end
+
     def applyFilters()
+        log "Applying filters"
         set :location_filter to (the (value of #filterLocation))
         set :sessiontype_filter to (the (value of #filterSessiontype))
         remove .hidden from .productItem
@@ -155,7 +171,6 @@ def main() -> None:
                 end
             end
         end
-        log :sessiontype_filter
         if :sessiontype_filter is not '- All -' then
             for i in .productItem 
                 if (the first of .sessiontype in i)'s textContent does not contain :sessiontype_filter then
@@ -165,7 +180,41 @@ def main() -> None:
         end
     end
 
-    def jumpToNextEvent()
+    def loadFilters() 
+        js
+            return new URLSearchParams(window.location.search);
+        end
+        set :search to it
+        set :location to :search.get("location")
+        if :location is not null then
+            for candidate in <#filterLocation option />
+                if candidate's @value is :location then
+                    set candidate's @selected to true
+                end
+            end
+        end
+        set :sessiontype to :search.get("sessiontype")
+        if :sessiontype is not null then
+            for candidate in <#filterSessiontype option />
+                if candidate's @value is :sessiontype then
+                    set candidate's @selected to true
+                end
+            end
+        end
+    end
+
+    def updateLocationForNextEvent()
+        log "Updating Location for next event"
+        call history.pushState({}, document.title, "#next-event")
+        call handleNextEventJump()
+    end
+
+    def handleNextEventJump()
+        log "handleNextEventJump"
+        set :location to window.location
+        if :location's hash is not "#next-event" then
+            exit
+        end
         set :now to Date.now()
         for i in .productItem 
             if i matches .hidden then
@@ -180,6 +229,7 @@ def main() -> None:
     end
 
     def markPastEvents()
+        log "Marking past events"
         set :now to Date.now()
         for i in .productItem 
             set :event_time to i's @timestamp as an Int
@@ -189,7 +239,6 @@ def main() -> None:
             end
             break
         end
-
     end
 </script>
 
@@ -254,7 +303,12 @@ def main() -> None:
 }
 </style>
 </head>""" + f"""
-<body _="init markPastEvents()">
+<body _="init
+    markPastEvents()
+    loadFilters()
+    applyFilters()
+    handleNextEventJump()
+    ">
 
 <main>
 <header>
@@ -280,7 +334,7 @@ def main() -> None:
 <label>Time</label>
 
 <ul>
-    <li style="margin-bottom: 1em;"><a _="on click jumpToNextEvent()">Jump to next event</a></li>
+    <li style="margin-bottom: 1em;"><a _="on click updateLocationForNextEvent()">Jump to next event</a></li>
 """
     for date in date_navs:
         result += f"""
@@ -297,7 +351,7 @@ def main() -> None:
 <form>
     <div class="field">
     <label for="filter_location">Location</label>
-    <select name="filter_location" id="filterLocation" _="on change applyFilters()"> """
+    <select name="filter_location" id="filterLocation" _="on change updateLocationForFilters()"> """
     for i, location in enumerate(locations):
         selected = " selected" if not i else ""
         result += f"""
@@ -310,7 +364,7 @@ def main() -> None:
 
     <div class="field">
     <label for="filter_sessiontype">Session Type</label>
-    <select name="filter_sessiontype" id="filterSessiontype" _="on change applyFilters()">
+    <select name="filter_sessiontype" id="filterSessiontype" _="on change updateLocationForFilters()">
 """
 
     for i, sessiontype in enumerate(sessiontypes):
