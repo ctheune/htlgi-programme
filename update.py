@@ -57,6 +57,11 @@ def main() -> None:
         hr = soup.new_tag("hr")
         event.insert(0, hr)
 
+        # Mark venue elements
+        venue = event.find(class_="product_details_inner").find_all("div")[2]
+        assert "Venue:" in event.get_text()
+        venue["class"] = "venue"
+
 
     # Update all links
     for a in soup.find_all("a"):
@@ -68,6 +73,7 @@ def main() -> None:
     for img in soup.find_all("img"):
         if not img["src"].startswith("http"):
             img["src"] = "https://howthelightgetsin.org/" + img["src"]
+
 
     # Remove the ticket forms
     for ticket_form in soup.find_all(class_="ht-fpe--event-ticket-wrapper"):
@@ -81,6 +87,8 @@ def main() -> None:
     for ticket in soup.find_all(class_="ht-fpe--festival-ticket"):
         ticket.extract()
 
+    # Date navigation
+
     dates_seen = set()
     date_navs = []
     for candidate in list(soup.find_all("h2", class_="htlgi-heading__small--text")):
@@ -91,6 +99,23 @@ def main() -> None:
         candidate["id"] = f"nav-day-{id}"
         date_navs.append((id, candidate))
         dates_seen.add(candidate.get_text())
+
+    # Category filtering
+    sessiontypes = set()
+    for candidate in soup.find_all(class_="sessiontype"):
+        sessiontypes.add(candidate.get_text())
+    sessiontypes = ["- All -"] + sorted(sessiontypes)
+
+    # Location filtering
+    locations = set()
+    for candidate in soup.find_all("div"):
+        text = candidate.get_text()
+        if text.startswith("Venue: "):
+            locations.add(text.split(": ", maxsplit=1)[1])
+    locations = ["- All -"] + sorted(locations)
+
+
+    last_update = datetime.datetime.now(datetime.UTC)
 
     print(f"Found {len(known_ids)} events.")
 
@@ -111,12 +136,43 @@ def main() -> None:
     <link rel="stylesheet" type="text/css" href="https://howthelightgetsin.org//htlgiecommerce/css/ecommerce.css?m=1655470222" />
     <link rel="stylesheet" type="text/css" href="https://howthelightgetsin.org//htlgiecommerce/css/EventProduct.css?m=1655470222" />
 
+<script type="text/hyperscript">
+    def applyFilters()
+        set :location_filter to (the (value of #filterLocation))
+        set :sessiontype_filter to (the (value of #filterSessiontype))
+        show .productItem
+        if :location_filter is not '- All -' then
+            for i in .productItem 
+                if (the first of .venue in i)'s textContent does not contain :location_filter then
+                    hide i
+                end
+            end
+        end
+        log :sessiontype_filter
+        if :sessiontype_filter is not '- All -' then
+            for i in .productItem 
+                if (the first of .sessiontype in i)'s textContent does not contain :sessiontype_filter then
+                    hide i
+                end
+            end
+        end
+    end
+</script>
+
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+
 <style type="text/css">
 
 #warning {
     border: 2px solid salmon;
     background: mistyrose;
     padding:1em;
+    padding-bottom: 0;
+    cursor: zoom-in;
+}
+
+.field {
+    width: 20em;
 }
 
 @media (max-width:1024px)  { 
@@ -130,16 +186,20 @@ def main() -> None:
 @media (min-width:1025px) {
    /* big landscape tablets, laptops,and desktops */ 
 
+    .col {
+        width: 20em;
+        float: left;
+    }
+
     #warning {
+        margin-bottom: 1em;
+        width: 20em;
         position: absolute;
-        width:40em;
-        padding: 1em;
-        right: 1em;
+        right: 0;
         top: 1em;
     }
 
     header {
-        height: 17em;
         position: sticky;
         top: 0;
         padding-top: 1em;
@@ -148,26 +208,30 @@ def main() -> None:
     }
 }
 </style>
-</head>
+</head>""" + f"""
 <body>
 
 <main>
 <header>
-<div id="warning">
-<h3>This is NOT the official HTLGI website.</h3>
-<p>
-This is a helper to navigate the programme faster than the official site. 
-This has been made for the Dave Snowden & friends @ HTLGI group.
-</p>
+<div id="warning" _="on click toggle the *display of the .explain in me">
+<h3>This is NOT the official HTLGI website. <span style="font-size:10pt; font-style: italic; font-weight:normal;">Click for details and help ...</span></h3>
+<div class="explain" _="init hide me">
+    <p>
+    This is a helper to navigate the programme faster than the official site. 
+    This has been made for the Dave Snowden & friends @ HTLGI group.
+    </p>
 
-<p>Get in touch on the Whatsapp group for feedback and improvement requests.</p>
+    <p>Get in touch on the Whatsapp group for feedback and improvement requests.</p>
 
-<p>All links open on the official site where you can buy fastpasses and tickets. To avoid confusion I have disabled those features here.</p>
+    <p>All links open on the official site where you can buy fastpasses and tickets. To avoid confusion I have disabled those features here.</p>
+
+    <p>Last updated: {last_update.strftime("%Y-%m-%d %H:%M:%S")} (UTC)</p>
 </div>
-
+</div>
 """
 
     result += """
+<div class="col">
 <ul>
 """
     for date in date_navs:
@@ -175,14 +239,44 @@ This has been made for the Dave Snowden & friends @ HTLGI group.
     <li><a href="#nav-day-{date[0]}">{date[1].get_text()}</a></li>
     """
 
-    last_update = datetime.datetime.now(datetime.UTC)
 
     result += f"""
 </ul>
+</div>
 
-<p>
-Last updated: {last_update.strftime("%Y-%m-%d %H:%M:%S")} (UTC)
-</p>
+<div class="col">
+
+<form>
+    <div class="field">
+    <label for="filter_location">Location</label>
+    <select name="filter_location" id="filterLocation" _="on change applyFilters()"> """
+    for i, location in enumerate(locations):
+        selected = " selected" if not i else ""
+        result += f"""
+        <option value="{location}" {selected}>{location}</option>
+"""
+
+    result += """
+    </select>
+    </div>
+
+    <div class="field">
+    <label for="filter_sessiontype">Session Type</label>
+    <select name="filter_sessiontype" id="filterSessiontype" _="on change applyFilters()">
+"""
+
+    for i, sessiontype in enumerate(sessiontypes):
+        selected = " selected" if not i else ""
+        result += f"""
+        <option value="{sessiontype}" {selected}>{sessiontype}</option>
+"""
+
+    result += """
+    </select>
+    </div>
+</form>    
+</div>
+<div style="clear:both"></div>
 </header>
 
 """
