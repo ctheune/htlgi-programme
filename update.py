@@ -7,6 +7,9 @@
 # ]
 # ///
 
+
+import argparse
+from zoneinfo import ZoneInfo
 from bs4 import BeautifulSoup
 import datetime
 import humanize
@@ -32,8 +35,9 @@ def download_programme():
     Path("download.html").write_text(result)
         
 
-def main() -> None:
-    download_programme()
+def main(download=True) -> None:
+    if download:
+        download_programme()
 
     raw_programme = Path("download.html").read_text()
 
@@ -66,8 +70,8 @@ def main() -> None:
         time = event.find(class_="programme-page--time").text.strip()
         # 'Fri 23 May 4:15pm'
         event_time = datetime.datetime.strptime(f"{date} {time};2025", "%a %d %b %I:%M%p;%Y")
-        timestamp = event_time.replace(tzinfo=datetime.timezone.utc).timestamp()
-        event["timestamp"] = str(timestamp * 1000)
+        timestamp = event_time.replace(tzinfo=ZoneInfo("Europe/London")).astimezone(datetime.timezone.utc).timestamp()
+        event["timestamp"] = str(timestamp * 1000) # js works in milliseconds
 
 
     # Update all links
@@ -122,7 +126,7 @@ def main() -> None:
     locations = ["- All -"] + sorted(locations)
 
 
-    last_update = datetime.datetime.now(datetime.UTC)
+    last_update = datetime.datetime.now(ZoneInfo("Europe/London"))
 
     print(f"Found {len(known_ids)} events.")
 
@@ -324,7 +328,7 @@ def main() -> None:
 
     <p>All links open on the official site where you can buy fastpasses and tickets. To avoid confusion I have disabled those features here.</p>
 
-    <p>Last updated: {last_update.strftime("%Y-%m-%d %H:%M:%S")} (UTC)</p>
+    <p>Last updated: {last_update.strftime("%Y-%m-%d %H:%M:%S")} (Europe/London)</p>
 </div>
 </div>
 """
@@ -394,4 +398,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description='Update the HTLGI programme')
+    parser.add_argument('--skip-download', action="store_true")
+    args = parser.parse_args()
+    main(not args.skip_download)
