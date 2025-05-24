@@ -147,6 +147,7 @@ def main(download=True) -> None:
     <link rel="stylesheet" type="text/css" href="https://howthelightgetsin.org//htlgiecommerce/css/ecommerce.css?m=1655470222" />
     <link rel="stylesheet" type="text/css" href="https://howthelightgetsin.org//htlgiecommerce/css/EventProduct.css?m=1655470222" />
 
+
 <script type="text/hyperscript">
     def updateLocationForFilters()
         log "Updating location for filters"
@@ -160,6 +161,7 @@ def main(download=True) -> None:
             set :hash to ""
         end
         call history.pushState({}, document.title, "?location=" + encodeURIComponent(:location.value) + "&sessiontype=" + encodeURIComponent(:sessiontype.value) + :hash)
+        call updateQRCode()
         call applyFilters()
     end
 
@@ -210,6 +212,7 @@ def main(download=True) -> None:
     def updateLocationForNextEvent()
         log "Updating Location for next event"
         call history.pushState({}, document.title, "#next-event")
+        call updateQRCode()
         call handleNextEventJump()
     end
 
@@ -244,9 +247,29 @@ def main(download=True) -> None:
             break
         end
     end
+
+    def initQRCode()
+        js 
+            return new QRCode(document.getElementById("qrcode"), {
+                text: window.location.href,
+                width: 256,
+                height: 256});
+        end
+        set $qrcode to it
+    end
+
+    def updateQRCode()
+        set qrcode to $qrcode
+        log qrcode
+        js (qrcode)
+            qrcode.clear();
+            qrcode.makeCode(window.location.href);
+        end
+    end
 </script>
 
     <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+    <script src="./qrcode.min.js"></script>
 
 <style type="text/css">
 
@@ -272,6 +295,32 @@ def main(download=True) -> None:
 }
 
 
+#qrcodeContainer {
+  position: fixed; /* Sit on top of the page content */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+#qrcodeContainer .wrapper {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10em;
+  width: 30em;
+  height: 30em;
+  background-color: white;
+  padding: 1em;
+}
+
+#qrcode img {
+}
 @media (max-width:1024px)  { 
     /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
 
@@ -283,6 +332,12 @@ def main(download=True) -> None:
 @media (min-width:1025px) {
    /* big landscape tablets, laptops,and desktops */ 
 
+   #share {
+    width: 20em;
+    position: absolute;
+    top: 7em;
+    right: 0;
+   }
     #warning {
         margin-bottom: 1em;
         width: 20em;
@@ -295,7 +350,7 @@ def main(download=True) -> None:
         position: sticky;
         top: 0;
         padding-top: 1em;
-        z-index: 2;
+        z-index: 1;
         background: white;
     }
 
@@ -312,9 +367,18 @@ def main(download=True) -> None:
     loadFilters()
     applyFilters()
     handleNextEventJump()
+    initQRCode()
     ">
 
 <main>
+
+<div id="qrcodeContainer" _="on click toggle my *display" style="display:none;">
+    <div class="wrapper">
+        <h2>Share this page</h2>
+        <div id="qrcode"></div>
+    </div>
+</div>
+
 <header>
 <div id="warning" _="on click toggle the *display of the .explain in me">
 <h3>This is NOT the official HTLGI website. <span style="font-size:10pt; font-style: italic; font-weight:normal;">Click for details and help ...</span></h3>
@@ -334,6 +398,11 @@ def main(download=True) -> None:
 """
 
     result += """
+
+<div id="share" _="on click toggle the *display of the #qrcodeContainer">
+    Share this page ...
+</div>
+
 <div class="col">
 <label>Time</label>
 
