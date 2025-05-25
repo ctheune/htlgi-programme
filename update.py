@@ -73,13 +73,7 @@ def main(download=True) -> None:
         timestamp = event_time.replace(tzinfo=ZoneInfo("Europe/London")).astimezone(datetime.timezone.utc).timestamp()
         event["timestamp"] = str(timestamp * 1000) # js works in milliseconds
 
-        # Add the "Jump to next chronological event" link
-        jump_link_p = soup.new_tag("p")
-        jump_link_a = soup.new_tag("a", href="#")
-        jump_link_a["_"] = "on click call updateLocationForNextEvent() then halt the event"
-        jump_link_a.string = "Jump to next chronological event"
-        jump_link_p.append(jump_link_a)
-        event.append(jump_link_p)
+        # Removed the per-event "Jump to next chronological event" link
 
 
     # Update all links
@@ -340,11 +334,34 @@ def main(download=True) -> None:
   flex-grow: 1; /* Added */
 }
 
+#nextEventLinkMobile {
+    display: none; /* Hidden by default, shown via media query */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 50%; /* Circular shape */
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px; /* Vertically center unicode symbol */
+    font-size: 24px; /* Size of the unicode symbol */
+    cursor: pointer;
+    z-index: 1000; /* Ensure it's above other content */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+
 @media (max-width:1024px)  { 
     /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
 
     #warning {
         margin-bottom: 1em;
+    }
+
+    #nextEventLinkMobile {
+        display: block; /* Show on mobile */
     }
 
 }
@@ -481,6 +498,14 @@ def main(download=True) -> None:
 """
 
     result += soup.prettify()
+
+    # Add the new mobile "next event" button HTML
+    result += """
+<div id="nextEventLinkMobile" _="on click call updateLocationForNextEvent() then halt the event">
+    &#x231B; <!-- Hourglass symbol -->
+</div>
+"""
+
     result += """
 </main>
 </body>
