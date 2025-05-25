@@ -501,7 +501,7 @@ def main(download=True) -> None:
 
     # Add the new mobile "next event" button HTML
     result += """
-<div id="nextEventLinkMobile" _="on click call updateLocationForNextEvent() then halt the event">
+<div id="nextEventLinkMobile" _="on click call updateLocationForNextEvent() then halt the event" title="Jump to the event that starts next">
     &#x231B; <!-- Hourglass symbol -->
 </div>
 """
