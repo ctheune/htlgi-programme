@@ -294,10 +294,6 @@ def main(download=True) -> None:
     display: none;
 }
 
-// make the qrcodeContainer look better: AI!
-// - add a border and a shade
-// - make any image that is put into the #qrcode div properly centered horizontally and vertically
-
 #qrcodeContainer {
   position: fixed; /* Sit on top of the page content */
   width: 100%; /* Full width (cover the whole page) */
@@ -320,10 +316,17 @@ def main(download=True) -> None:
   height: 30em;
   background-color: white;
   padding: 1em;
+  border: 1px solid #cccccc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
 }
 
-#qrcode img {
+#qrcode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 @media (max-width:1024px)  { 
     /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
 
