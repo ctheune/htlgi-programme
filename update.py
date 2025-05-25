@@ -308,7 +308,8 @@ def main(download=True) -> None:
 }
 
 #qrcodeContainer .wrapper {
-  display: block;
+  display: flex; /* Changed from block */
+  flex-direction: column; /* Added */
   margin-left: auto;
   margin-right: auto;
   margin-top: 10em;
@@ -325,6 +326,7 @@ def main(download=True) -> None:
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-grow: 1; /* Added */
 }
 
 @media (max-width:1024px)  { 
