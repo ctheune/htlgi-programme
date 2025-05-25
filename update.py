@@ -352,6 +352,24 @@ def main(download=True) -> None:
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
+#scrollToTopMobile {
+    display: none; /* Hidden by default, shown via media query */
+    position: fixed;
+    bottom: 20px;
+    right: 80px; /* Positioned to the left of #nextEventLinkMobile */
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 50%; /* Circular shape */
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px; /* Vertically center unicode symbol */
+    font-size: 24px; /* Size of the unicode symbol */
+    cursor: pointer;
+    z-index: 1000; /* Ensure it's above other content */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
 
 @media (max-width:1024px)  { 
     /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
@@ -361,6 +379,10 @@ def main(download=True) -> None:
     }
 
     #nextEventLinkMobile {
+        display: block; /* Show on mobile */
+    }
+
+    #scrollToTopMobile {
         display: block; /* Show on mobile */
     }
 
@@ -503,6 +525,12 @@ def main(download=True) -> None:
     result += """
 <div id="nextEventLinkMobile" _="on click call updateLocationForNextEvent() then halt the event" title="Jump to the event that starts next">
     &#x231B; <!-- Hourglass symbol -->
+</div>
+"""
+    # Add the new mobile "scroll to top" button HTML
+    result += """
+<div id="scrollToTopMobile" _="on click go to top of the body smoothly then halt the event" title="Scroll to top">
+    &#x25B2; <!-- Black Up-Pointing Triangle symbol -->
 </div>
 """
 
