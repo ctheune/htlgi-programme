@@ -73,6 +73,14 @@ def main(download=True) -> None:
         timestamp = event_time.replace(tzinfo=ZoneInfo("Europe/London")).astimezone(datetime.timezone.utc).timestamp()
         event["timestamp"] = str(timestamp * 1000) # js works in milliseconds
 
+        # Add the "Jump to next chronological event" link
+        jump_link_p = soup.new_tag("p")
+        jump_link_a = soup.new_tag("a", href="#")
+        jump_link_a["_"] = "on click call updateLocationForNextEvent() then halt the event"
+        jump_link_a.string = "Jump to next chronological event"
+        jump_link_p.append(jump_link_a)
+        event.append(jump_link_p)
+
 
     # Update all links
     for a in soup.find_all("a"):
@@ -423,7 +431,7 @@ def main(download=True) -> None:
 <label>Time</label>
 
 <ul>
-    <li style="margin-bottom: 1em;"><a _="on click updateLocationForNextEvent()">Jump to next event</a></li>
+    <li style="margin-bottom: 1em;"><a href="#" _="on click call updateLocationForNextEvent() then halt the event">Jump to next event</a></li>
 """
     for date in date_navs:
         result += f"""
