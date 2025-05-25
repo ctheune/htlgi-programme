@@ -524,12 +524,12 @@ def main(download=True) -> None:
     # Add the new mobile "next event" button HTML
     result += """
 <div id="nextEventLinkMobile" _="on click call updateLocationForNextEvent() then halt the event" title="Jump to the event that starts next">
-    &#x231B; <!-- Hourglass symbol -->
+    &#x231A; <!-- Watch symbol -->
 </div>
 """
     # Add the new mobile "scroll to top" button HTML
     result += """
-<div id="scrollToTopMobile" _="on click go to top of the body smoothly then halt the event" title="Scroll to top">
+<div id="scrollToTopMobile" _="on click js window.scrollTo({ top: 0, behavior: 'smooth' }); end then halt the event" title="Scroll to top">
     &#x25B2; <!-- Black Up-Pointing Triangle symbol -->
 </div>
 """
