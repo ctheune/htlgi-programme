@@ -281,6 +281,7 @@ def main(download=True) -> None:
     padding:1em;
     padding-bottom: 0;
     cursor: zoom-in;
+    border-radius: 8px;
 }
 
 .col {
