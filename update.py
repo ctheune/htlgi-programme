@@ -377,12 +377,12 @@ def main(download=True) -> None:
     markPastEvents()
     loadFilters()
     applyFilters()
+    initQRCode()
     if document.location.hash is '' or document.location.hash is null then
         call updateLocationForNextEvent()
     else
         call handleNextEventJump()
     end
-    initQRCode()
     ">
 
 <main>
