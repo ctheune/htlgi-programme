@@ -256,6 +256,7 @@ def main(download=True) -> None:
                 height: 256});
         end
         set $qrcode to it
+        set the textContent of #qrcodeUrlText to window.location.href
     end
 
     def updateQRCode()
@@ -265,6 +266,7 @@ def main(download=True) -> None:
             qrcode.clear();
             qrcode.makeCode(window.location.href);
         end
+        set the textContent of #qrcodeUrlText to window.location.href
     end
 </script>
 
@@ -382,7 +384,8 @@ def main(download=True) -> None:
 
 <div id="qrcodeContainer" _="on click toggle my *display" style="display:none;">
     <div class="wrapper">
-        <h2>Share this page</h2>
+        <h2 style="text-align: center;">Share this page</h2>
+        <p id="qrcodeUrlText" style="text-align: center; font-size: 0.8em; margin-top: 0.5em; margin-bottom: 1em; word-break: break-all;"></p>
         <div id="qrcode"></div>
     </div>
 </div>
