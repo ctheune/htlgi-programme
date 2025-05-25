@@ -294,6 +294,9 @@ def main(download=True) -> None:
     display: none;
 }
 
+// make the qrcodeContainer look better: AI!
+// - add a border and a shade
+// - make any image that is put into the #qrcode div properly centered horizontally and vertically
 
 #qrcodeContainer {
   position: fixed; /* Sit on top of the page content */
