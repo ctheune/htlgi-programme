@@ -427,13 +427,14 @@ def main(download=True, output=Path(".")) -> None:
         position: absolute;
         right: 0;
         top: 1em;
+        z-index: 1;
     }
 
     header {
         position: sticky;
         top: 0;
         padding-top: 1em;
-        z-index: 1;
+        z-index: 10;
         background: white;
     }
 
