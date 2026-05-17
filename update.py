@@ -578,7 +578,7 @@ def main(download=True, output=Path(".")) -> None:
     (output / "manifest.json").write_text("""{
   "name": "HowTheLightGetsIn Hay 2026",
   "short_name": "HTLGI Hay",
-  "start_url": "./result.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
