@@ -572,7 +572,7 @@ def main(download=True, output=Path(".")) -> None:
 </html>
 """
 
-    (output / "result.html").write_text(result)
+    (output / "index.html").write_text(result)
     shutil.copy(Path(__file__).parent / "favicon.png", output / "favicon.png")
 
     (output / "manifest.json").write_text("""{
