@@ -9,6 +9,7 @@
 
 
 import argparse
+import shutil
 from zoneinfo import ZoneInfo
 from bs4 import BeautifulSoup
 import datetime
@@ -35,7 +36,9 @@ def download_programme():
     Path("download.html").write_text(result)
 
 
-def main(download=True) -> None:
+def main(download=True, output=Path(".")) -> None:
+    output = Path(output)
+    output.mkdir(parents=True, exist_ok=True)
     if download:
         download_programme()
 
@@ -569,9 +572,10 @@ def main(download=True) -> None:
 </html>
 """
 
-    Path("result.html").write_text(result)
+    (output / "result.html").write_text(result)
+    shutil.copy(Path(__file__).parent / "favicon.png", output / "favicon.png")
 
-    Path("manifest.json").write_text("""{
+    (output / "manifest.json").write_text("""{
   "name": "HowTheLightGetsIn Hay 2026",
   "short_name": "HTLGI Hay",
   "start_url": "./result.html",
@@ -593,5 +597,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Update the HTLGI programme')
     parser.add_argument('--skip-download', action="store_true")
+    parser.add_argument('--output', default=".", help='Directory to write result.html and manifest.json')
     args = parser.parse_args()
-    main(not args.skip_download)
+    main(not args.skip_download, args.output)
