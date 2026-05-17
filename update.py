@@ -466,9 +466,16 @@ def main(download=True) -> None:
     This has been made for the Dave Snowden & friends @ HTLGI group.
     </p>
 
-    <p>Get in touch on the Whatsapp group for feedback and improvement requests.</p>
+    <p>Get in touch on the Signal group for feedback and improvement requests.</p>
 
-    <p>All links open on the official site where you can buy fastpasses and tickets. To avoid confusion I have disabled those features here.</p>
+    <p>Notes:</p>
+
+    <ul>
+        <li>Most links open on the official site.</li>
+        <li>Fastpasses can be booked here and will add items to your basket on the official site.</li>
+        <li>Other bookings currently need to go through the official site.</li>
+        <li>You can add this page as an app to your phone using the "Share >> Add to home screen" feature.</li>
+    </ul>
 
     <p>Last updated: {last_update.strftime("%Y-%m-%d %H:%M:%S")} (Europe/London)</p>
 </div>
