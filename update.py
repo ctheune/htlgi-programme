@@ -92,9 +92,19 @@ def main(download=True) -> None:
     for ticket_form in soup.find_all(class_="ht-fpe--event-ticket-wrapper"):
         ticket_form.extract()
 
-    # disable fastpass headers
-    for fastpass in soup.find_all(class_="ht-fpe--fast-pass-header"):
-        del fastpass["href"]
+    for fastpass_header in soup.find_all(class_="ht-fpe--fast-pass-header"):
+        del fastpass_header["href"]
+        fastpass_header["_"] = """
+            on click
+                set :form to the next .ht-fpe--fast-pass-info
+                show :form with *display:block"""
+
+    for fastpass_close in soup.find_all(class_="ht-fpe--fast-pass-info-close"):
+        del fastpass_close["href"]
+        fastpass_close["_"] = """
+            on click
+                set :form to the closest .ht-fpe--fast-pass-info
+                hide :form"""
 
     # disable generic ticket link
     for ticket in soup.find_all(class_="ht-fpe--festival-ticket"):
@@ -277,6 +287,10 @@ def main(download=True) -> None:
 
 <style type="text/css">
 
+.ht-fpe--fast-pass-header {
+    cursor: pointer;
+}
+
 #warning {
     border: 2px solid salmon;
     background: mistyrose;
@@ -294,6 +308,7 @@ def main(download=True) -> None:
 .elapsed {
   opacity: 0.3;
 }
+
 
 .hidden {
     display: none;
