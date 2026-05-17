@@ -151,6 +151,13 @@ def main(download=True) -> None:
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="shortcut icon" href="https://howthelightgetsin.org/favicon.ico" />
+    <link rel="apple-touch-icon" href="./favicon.png" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="HTLGI Hay">
+    <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="https://use.typekit.net/vfv1goc.css">
     <link href="https://fonts.googleapis.com/css?family=Arvo:400,400i,700,700i" rel="stylesheet">
 
@@ -563,6 +570,23 @@ def main(download=True) -> None:
 """
 
     Path("result.html").write_text(result)
+
+    Path("manifest.json").write_text("""{
+  "name": "HowTheLightGetsIn Hay 2026",
+  "short_name": "HTLGI Hay",
+  "start_url": "./result.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "./favicon.png",
+      "sizes": "65x64",
+      "type": "image/png"
+    }
+  ]
+}
+""")
 
 
 if __name__ == "__main__":
