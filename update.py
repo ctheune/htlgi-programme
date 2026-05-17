@@ -33,7 +33,7 @@ def download_programme():
         result += response.text
         offset += chunks
     Path("download.html").write_text(result)
-        
+
 
 def main(download=True) -> None:
     if download:
@@ -69,7 +69,7 @@ def main(download=True) -> None:
         date = event.find(class_="programme-page--date").text.strip()
         time = event.find(class_="programme-page--time").text.strip()
         # 'Fri 23 May 4:15pm'
-        event_time = datetime.datetime.strptime(f"{date} {time};2025", "%a %d %b %I:%M%p;%Y")
+        event_time = datetime.datetime.strptime(f"{date} {time};2026", "%a %d %b %I:%M%p;%Y")
         timestamp = event_time.replace(tzinfo=ZoneInfo("Europe/London")).astimezone(datetime.timezone.utc).timestamp()
         event["timestamp"] = str(timestamp * 1000) # js works in milliseconds
 
@@ -173,14 +173,14 @@ def main(download=True) -> None:
         set :sessiontype_filter to (the (value of #filterSessiontype))
         remove .hidden from .productItem
         if :location_filter is not '- All -' then
-            for i in .productItem 
+            for i in .productItem
                 if (the first of .venue in i)'s textContent does not contain :location_filter then
                     add .hidden to i
                 end
             end
         end
         if :sessiontype_filter is not '- All -' then
-            for i in .productItem 
+            for i in .productItem
                 if (the first of .sessiontype in i)'s textContent does not contain :sessiontype_filter then
                     add .hidden to i
                 end
@@ -188,7 +188,7 @@ def main(download=True) -> None:
         end
     end
 
-    def loadFilters() 
+    def loadFilters()
         js
             return new URLSearchParams(window.location.search);
         end
@@ -225,7 +225,7 @@ def main(download=True) -> None:
             exit
         end
         set :now to Date.now()
-        for i in .productItem 
+        for i in .productItem
             if i matches .hidden then
                 continue
             end
@@ -240,7 +240,7 @@ def main(download=True) -> None:
     def markPastEvents()
         log "Marking past events"
         set :now to Date.now()
-        for i in .productItem 
+        for i in .productItem
             set :event_time to i's @timestamp as an Int
             if :event_time < :now then
                 add .elapsed to it
@@ -251,7 +251,7 @@ def main(download=True) -> None:
     end
 
     def initQRCode()
-        js 
+        js
             return new QRCode(document.getElementById("qrcode"), {
                 text: window.location.href,
                 width: 256,
@@ -371,7 +371,7 @@ def main(download=True) -> None:
 }
 
 
-@media (max-width:1024px)  { 
+@media (max-width:1024px)  {
     /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
 
     #warning {
@@ -388,7 +388,7 @@ def main(download=True) -> None:
 
 }
 @media (min-width:1025px) {
-   /* big landscape tablets, laptops,and desktops */ 
+   /* big landscape tablets, laptops,and desktops */
 
    #share {
     width: 20em;
@@ -414,7 +414,7 @@ def main(download=True) -> None:
 
     html {
             scroll-behavior: smooth;
-            scroll-padding-top: 11em; 
+            scroll-padding-top: 11em;
     }
 
 }
@@ -447,7 +447,7 @@ def main(download=True) -> None:
 <h3>This is NOT the official HTLGI website. <span style="font-size:10pt; font-style: italic; font-weight:normal;">Click for details and help ...</span></h3>
 <div class="explain" style="display:none;">
     <p>
-    This is a helper to navigate the programme faster than the official site. 
+    This is a helper to navigate the programme faster than the official site.
     This has been made for the Dave Snowden & friends @ HTLGI group.
     </p>
 
@@ -512,7 +512,7 @@ def main(download=True) -> None:
     result += """
     </select>
     </div>
-</form>    
+</form>
 </div>
 <div style="clear:both"></div>
 </header>
